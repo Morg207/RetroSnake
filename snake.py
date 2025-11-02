@@ -149,7 +149,7 @@ class HungerBar:
 class Apple:
     def __init__(self):
         self.x_tile = random.randint(0, WIDTH_IN_BLOCKS-1)
-        self.y_tile = random.randint(0, HEIGHT_IN_BLOCKS-1)
+        self.y_tile = random.randint(3, HEIGHT_IN_BLOCKS-1)
         self.colour = "#c4372d"
         self.pulse = False
         self.pulse_counter = 0
@@ -170,7 +170,7 @@ class Apple:
 
     def gen_new_position(self):
         self.x_tile = random.randint(0, WIDTH_IN_BLOCKS - 1)
-        self.y_tile = random.randint(0, HEIGHT_IN_BLOCKS - 1)
+        self.y_tile = random.randint(3, HEIGHT_IN_BLOCKS - 1)
         choices = [1,2,3,4,5,6,7,8,9,10]
         choice = random.choice(choices)
         if choice == 1 or choice == 2:
