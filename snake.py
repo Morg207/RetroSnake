@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font
 import pygame
 import random
+import time
 
 pygame.mixer.init()
 
@@ -26,6 +27,7 @@ class Game:
         self.score_booster = "+1"
         self.score_font = font.Font(family="Segoe UI",size=17,weight="bold")
         self.game_font = font.Font(family="Segoe UI",size=16,weight="bold")
+        self.hunger_bar = HungerBar(self.lose_sound, self.snake)
         self.draw()
 
     def init_canvas(self):
@@ -53,6 +55,7 @@ class Game:
                 self.score += 5
                 self.score_booster = "+5"
                 self.ga_sound.play()
+            self.hunger_bar.fill_bar()
             self.apple.gen_new_position()
             self.booster_x = head.x * BLOCK_SIZE
             self.booster_y = head.y * BLOCK_SIZE
@@ -66,6 +69,7 @@ class Game:
             self.score = 0
             self.snake.reset()
             self.apple.gen_new_position()
+            self.hunger_bar.reset()
 
     def collide_with_body(self, head):
         for x in range(1, len(self.snake.body)):
@@ -75,6 +79,7 @@ class Game:
                 self.score = 0
                 self.snake.reset()
                 self.apple.gen_new_position()
+                self.hunger_bar.reset()
                 break
 
     def handle_collision(self):
@@ -103,10 +108,43 @@ class Game:
         self.handle_collision()
         self.draw_score_booster()
         self.draw_score()
+        self.hunger_bar.draw(self.canvas)
         self.window.after(150,self.draw)
 
     def run_game(self):
         self.window.mainloop()
+
+class HungerBar:
+    def __init__(self, lose_sound, snake):
+        self.snake = snake
+        self.lose_sound = lose_sound
+        self.x = 390
+        self.y = 50
+        self.text_x = 448
+        self.text_y = 28
+        self.bar_length = 115
+        self.start_bar_length = 115
+        self.eat_amount = 30
+        self.bar_height = 15
+        self.hunger_font = font.Font(family="Segoe UI",size=16,weight="bold")
+
+    def draw(self, canvas):
+        canvas.create_rectangle(self.x, self.y, self.x+self.start_bar_length, self.y+self.bar_height, fill="#b35a1b", outline="white", width=2)
+        canvas.create_rectangle(self.x, self.y, self.x+self.bar_length, self.y+self.bar_height, fill="orange", outline="white",width=2)
+        canvas.create_text(self.text_x,self.text_y,text="Hunger", font=self.hunger_font, fill="white")
+        self.bar_length -= 1
+        self.bar_length = max(0, self.bar_length)
+        if self.bar_length == 0:
+            self.lose_sound.play()
+            self.snake.reset()
+            self.bar_length = self.start_bar_length
+
+    def fill_bar(self):
+        self.bar_length += self.eat_amount
+        self.bar_length = min(self.bar_length, self.start_bar_length)
+
+    def reset(self):
+        self.bar_length = self.start_bar_length
 
 class Apple:
     def __init__(self):
