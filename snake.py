@@ -19,7 +19,6 @@ class Game:
         self.snake = Snake()
         self.apple = Apple()
         self.init_sounds()
-        self.score = 0
         self.draw_booster = False
         self.booster_x = 0
         self.booster_y = 0
@@ -48,11 +47,11 @@ class Game:
     def collide_with_apple(self, head):
         if head.x == self.apple.x_tile and head.y == self.apple.y_tile:
             if self.apple.colour == "#c4372d":
-                self.score += 1
+                self.snake.score += 1
                 self.score_booster = "+1"
                 self.eat_sound.play()
             elif self.apple.colour == "#b59b35" or self.apple.colour == "#f2d25a":
-                self.score += 5
+                self.snake.score += 5
                 self.score_booster = "+5"
                 self.ga_sound.play()
             self.hunger_bar.fill_bar()
@@ -66,7 +65,6 @@ class Game:
     def collide_with_walls(self, head):
         if head.x < 0 or head.x > WIDTH_IN_BLOCKS-1 or head.y < 0 or head.y > HEIGHT_IN_BLOCKS-1:
             self.lose_sound.play()
-            self.score = 0
             self.snake.reset()
             self.apple.gen_new_position()
             self.hunger_bar.reset()
@@ -76,7 +74,6 @@ class Game:
             body_part = self.snake.body[x]
             if body_part.x == head.x and body_part.y == head.y:
                 self.lose_sound.play()
-                self.score = 0
                 self.snake.reset()
                 self.apple.gen_new_position()
                 self.hunger_bar.reset()
@@ -98,7 +95,7 @@ class Game:
                 self.booster_count = 0
 
     def draw_score(self):
-        self.canvas.create_text(540 // 2, 30, text=f"Score: {self.score}", fill="white", font=self.score_font)
+        self.canvas.create_text(540 // 2, 30, text=f"Score: {self.snake.score}", fill="white", font=self.score_font)
 
     def draw(self):
         self.canvas.delete("all")
@@ -186,11 +183,13 @@ class Snake:
         self.direction = "a"
         self.extend = False
         self.key_buffer = []
+        self.score = 0
 
     def reset(self):
         self.body = [pygame.Vector2(22, 22), pygame.Vector2(23, 22), pygame.Vector2(24, 22)]
         self.direction = "a"
         self.extend = False
+        self.score = 0
 
     def handle_keyboard(self, event):
         key = event.keysym
